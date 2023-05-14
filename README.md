@@ -5,6 +5,17 @@
 The ADXL345 has an interesting feature called tap detection. With the appropriate tuning, this can be used to implement a nozzle probe on 3D printers.
 This project aims to support nozzle probing through tap detection for printers using Klipper.
 
+You can watch this thing in action here:
+[https://www.youtube.com/shorts/_qd0kMkrVZw](https://www.youtube.com/shorts/_qd0kMkrVZw)
+
+Results you can expect for a properly tuned system (This was on a Voron Trident):
+
+```
+probe accuracy results: maximum 0.007500, minimum 0.000937, range 0.006563, average 0.004031, median 0.004219, standard deviation 0.001841
+```
+
+I also measured the force on the bed using a standard kitchen scale, this was approximately 200g. A CAN bus board was used, so a direct connection might result in a quicker stop (See Multi MCU homing in the Klipper docs for more information on this).
+
 ## Installation
 
 ```bash
