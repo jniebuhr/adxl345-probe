@@ -1,5 +1,7 @@
 # ADXL345 Probe
 
+**!!! This project is in a BETA state, use at your own risk !!!**
+
 The ADXL345 has an interesting feature called tap detection. With the appropriate tuning, this can be used to implement a nozzle probe on 3D printers.
 This project aims to support nozzle probing through tap detection for printers using Klipper.
 
@@ -11,6 +13,15 @@ git clone https://github.com/jniebuhr/adxl345-probe
 cd adxl345-probe
 ./scripts/install.sh
 ```
+
+## Physical setup
+
+This code requires the ADXL int1 or int2 pins to be wired to one of your boards (preferrably the one that controls Z motion).
+For a ADXL345 breakout board, simply run a wire. If you're using a CAN toolboard, the following boards are supported as they have wired the pins:
+
+- Mellow Fly SB2040
+- Mellow Fly SHT36 v2
+- Huvud
 
 ## Configuration
 
