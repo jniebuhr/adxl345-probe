@@ -40,6 +40,10 @@ samples_tolerance: 0.01
 samples_tolerance_retries: 20
 ```
 
+## Tuning guide
+
+In progress...
+
 ## License
 
 This project is licensed as
