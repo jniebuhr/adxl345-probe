@@ -30,8 +30,8 @@ cd adxl345-probe
 This code requires the ADXL int1 or int2 pins to be wired to one of your boards (preferrably the one that controls Z motion).
 For a ADXL345 breakout board, simply run a wire. If you're using a CAN toolboard, the following boards are supported as they have wired the pins:
 
-- Mellow Fly SB2040
-- Mellow Fly SHT36 v2
+- [Mellow Fly SB2040](https://aliexpress.com/item/1005004675264551.html)
+- [Mellow Fly SHT36 v2](https://aliexpress.com/item/1005004687165673.html)
 - Huvud
 
 ## Configuration
