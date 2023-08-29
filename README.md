@@ -1,4 +1,5 @@
 # ADXL345 Probe
+[![](https://dcbadge.vercel.app/api/server/APw7rgPGPf)](https://discord.gg/APw7rgPGPf)
 
 **!!! This project is in a BETA state, use at your own risk !!!**
 
