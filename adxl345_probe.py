@@ -102,7 +102,7 @@ class ADXL345Probe:
         chip.set_reg(REG_INT_ENABLE, 0x00, minclock=clock)
         chip.read_reg(REG_INT_SOURCE)
         chip.set_reg(REG_INT_ENABLE, 0x40, minclock=clock)
-        self.is_measuring = chip.read_reg(adxl345.REG_POWER_CTL == 0x08
+        self.is_measuring = (chip.read_reg(adxl345.REG_POWER_CTL) == 0x08)
         if not self.is_measuring:
             chip.set_reg(adxl345.REG_POWER_CTL, 0x08, minclock=clock)
         if not self._try_clear_tap():
