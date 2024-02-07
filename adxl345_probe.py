@@ -21,6 +21,7 @@ class ADXL345Probe:
         self.deactivate_gcode = gcode_macro.load_template(config, 'deactivate_gcode', '')
         int_pin = config.get('int_pin').strip()
         self.inverted = False
+        self.is_measuring = False
         if int_pin.startswith('!'):
             self.inverted = True
             int_pin = int_pin[1:].strip()
@@ -101,7 +102,8 @@ class ADXL345Probe:
         chip.set_reg(REG_INT_ENABLE, 0x00, minclock=clock)
         chip.read_reg(REG_INT_SOURCE)
         chip.set_reg(REG_INT_ENABLE, 0x40, minclock=clock)
-        if not chip.is_measuring():
+        self.is_measuring = chip.read_reg(adxl345.REG_POWER_CTL == 0x08
+        if not self.is_measuring:
             chip.set_reg(adxl345.REG_POWER_CTL, 0x08, minclock=clock)
         if not self._try_clear_tap():
             raise self.printer.command_error("ADXL345 tap triggered before move, it may be set too sensitive.")
@@ -113,7 +115,7 @@ class ADXL345Probe:
         print_time = toolhead.get_last_move_time()
         clock = chip.mcu.print_time_to_clock(print_time)
         chip.set_reg(REG_INT_ENABLE, 0x00, minclock=clock)
-        if not chip.is_measuring():
+        if not self.is_measuring:
             chip.set_reg(adxl345.REG_POWER_CTL, 0x00)
         self.deactivate_gcode.run_gcode_from_command()
         if not self._try_clear_tap():
