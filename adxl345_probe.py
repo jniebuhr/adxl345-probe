@@ -32,6 +32,7 @@ class ADXL345Probe:
         self.tap_thresh = config.getfloat('tap_thresh', 5000, minval=TAP_SCALE, maxval=100000.)
         self.tap_dur = config.getfloat('tap_dur', 0.01, above=DUR_SCALE, maxval=0.1)
         self.position_endstop = config.getfloat('z_offset')
+        self.disable_fans = [fan.strip() for fan in config.get("disable_fans", "").split(",") if fan]
 
         self.adxl345 = self.printer.lookup_object('adxl345')
         self.next_cmd_time = self.action_end_time = 0.
@@ -48,7 +49,6 @@ class ADXL345Probe:
         self.home_start = self.mcu_endstop.home_start
         self.home_wait = self.mcu_endstop.home_wait
         self.query_endstop = self.mcu_endstop.query_endstop
-        self.phoming = self.printer.lookup_object('homing')
         # Register commands and callbacks
         self.gcode = self.printer.lookup_object('gcode')
         self.gcode.register_mux_command("SET_ACCEL_PROBE", "CHIP", None, self.cmd_SET_ACCEL_PROBE, desc=self.cmd_SET_ACCEL_PROBE_help)
@@ -68,16 +68,29 @@ class ADXL345Probe:
         chip.set_reg(REG_DUR, int(self.tap_dur / DUR_SCALE))
 
     def handle_mcu_identify(self):
+        self.phoming = self.printer.lookup_object('homing')
         kin = self.printer.lookup_object('toolhead').get_kinematics()
         for stepper in kin.get_steppers():
             if stepper.is_active_axis('z'):
                 self.add_stepper(stepper)
 
+    def control_fans(self, disable=True):
+        for fan in self.disable_fans:
+            fan = self.printer.lookup_object(fan)
+            if disable:
+                fan._fan_speed = fan.fan_speed
+                fan.fan_speed = 0
+            else:
+                fan.fan_speed = fan._fan_speed
+                fan._fan_speed = 0
+
     def multi_probe_begin(self):
-        pass
+        self._in_multi_probe = True
+        self.control_fans(disable=True)
 
     def multi_probe_end(self):
-        pass
+        self.control_fans(disable=False)
+        self._in_multi_probe = False
 
     def probing_move(self, pos, speed):
         return self.phoming.probing_move(self, pos, speed)
@@ -111,6 +124,8 @@ class ADXL345Probe:
             chip.set_reg(adxl345.REG_POWER_CTL, 0x08, minclock=clock)
         if not self._try_clear_tap():
             raise self.printer.command_error("ADXL345 tap triggered before move, it may be set too sensitive.")
+        if not self._in_multi_probe:
+            self.control_fans(disable=True)
 
     def probe_finish(self, hmove):
         chip = self.adxl345
@@ -124,6 +139,8 @@ class ADXL345Probe:
         self.deactivate_gcode.run_gcode_from_command()
         if not self._try_clear_tap():
             raise self.printer.command_error("ADXL345 tap triggered after move, it may be set too sensitive.")
+        if not self._in_multi_probe:
+            self.control_fans(disable=False)
 
     cmd_SET_ACCEL_PROBE_help = "Configure ADXL345 parameters related to probing"
 
