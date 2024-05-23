@@ -48,6 +48,7 @@ class ADXL345Probe:
         self.home_start = self.mcu_endstop.home_start
         self.home_wait = self.mcu_endstop.home_wait
         self.query_endstop = self.mcu_endstop.query_endstop
+        self.phoming = self.printer.lookup_object('homing')
         # Register commands and callbacks
         self.gcode = self.printer.lookup_object('gcode')
         self.gcode.register_mux_command("SET_ACCEL_PROBE", "CHIP", None, self.cmd_SET_ACCEL_PROBE, desc=self.cmd_SET_ACCEL_PROBE_help)
@@ -77,6 +78,9 @@ class ADXL345Probe:
 
     def multi_probe_end(self):
         pass
+
+    def probing_move(self, pos, speed):
+        return self.phoming.probing_move(self, pos, speed)
 
     def get_position_endstop(self):
         return self.position_endstop
