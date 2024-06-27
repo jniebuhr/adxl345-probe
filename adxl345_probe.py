@@ -54,16 +54,10 @@ class ADXL345Probe:
         self.gcode.register_mux_command("SET_ACCEL_PROBE", "CHIP", None, self.cmd_SET_ACCEL_PROBE, desc=self.cmd_SET_ACCEL_PROBE_help)
         self.printer.register_event_handler('klippy:connect', self.init_adxl)
         self.printer.register_event_handler('klippy:mcu_identify', self.handle_mcu_identify)
-        # Patch new PrinterProbe because of klipper commit d4bae4dffe8d3996ed1b1dd8f5230a062ae3d033
-        try:
-            printer_probe = probe.PrinterProbe(config, self)
-        except TypeError:
-            printer_probe = probe.PrinterProbe(config)
-            printer_probe.mcu_probe = self
-            printer_probe.cmd_helper = probe.ProbeCommandHelper(config, printer_probe, self.query_endstop)
-            printer_probe.probe_offsets = probe.ProbeOffsetsHelper(config)
-            printer_probe.probe_session = probe.ProbeSessionHelper(config, self)
-        self.printer.add_object('probe', printer_probe)
+        self.cmd_helper = probe.ProbeCommandHelper(config, self, self.query_endstop)
+        self.probe_offsets = probe.ProbeOffsetsHelper(config)
+        self.probe_session = probe.ProbeSessionHelper(config, self)
+        self.printer.add_object('probe', self)
 
     def init_adxl(self):
         chip = self.adxl345
@@ -106,6 +100,18 @@ class ADXL345Probe:
 
     def get_position_endstop(self):
         return self.position_endstop
+
+    def get_probe_params(self, gcmd=None):
+        return self.probe_session.get_probe_params(gcmd)
+
+    def get_offsets(self):
+        return self.probe_offsets.get_offsets()
+
+    def get_status(self, eventtime):
+        return self.cmd_helper.get_status(eventtime)
+
+    def start_probe_session(self, gcmd):
+        return self.probe_session.start_probe_session(gcmd)
 
     def _try_clear_tap(self):
         chip = self.adxl345
