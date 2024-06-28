@@ -110,8 +110,13 @@ class ADXL345Probe:
     def get_status(self, eventtime):
         return self.cmd_helper.get_status(eventtime)
 
-    def start_probe_session(self, gcmd):
+    def start_probe_session(self, gcmd, fuzzing=None):
+        if fuzzing is not None:
+            return self.probe_session.start_probe_session(gcmd, fuzzing)
         return self.probe_session.start_probe_session(gcmd)
+
+    def get_session(self):
+        return self.probe_session
 
     def _try_clear_tap(self):
         chip = self.adxl345
