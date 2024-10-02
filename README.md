@@ -32,11 +32,19 @@ cd adxl345-probe
 This code requires the ADXL int1 or int2 pins to be wired to one of your boards (preferrably the one that controls Z motion).
 For a ADXL345 breakout board, simply run a wire. If you're using a CAN toolboard, the following boards are supported as they have wired the pins:
 
-- [Mellow Fly SB2040](https://aliexpress.com/item/1005004675264551.html)
-- [Mellow Fly SHT36 v2](https://aliexpress.com/item/1005004687165673.html)
-- Huvud
+## Supported Boards
+
+| Board  | Supported | int_pin | probe_pin | Link |
+| ------ | :-------: | ------- | --------- | ---- |
+| Mellow Fly SB2040 (v1/v2) | ✓ | int1 | gpio21 | https://aliexpress.com/item/1005004675264551.html |
+| Mellow Fly SHT36 v2 | ✓ | int1 | PA10 | https://aliexpress.com/item/1005004675264551.html |
+| Huvud | ✓ | ? | ? | |
+| NiteHawk | ✓ | int1 | gpio21 |
+| EBB36 | with soldering | int1/int2 | choose | |
 
 ## Configuration
+
+This configuration must be **below** your adxl345 section.
 
 ```
 [adxl345_probe]
@@ -45,6 +53,7 @@ int_pin: int1 # select either int1 or int2, depending on your choice of wiring
 tap_thresh: 12000 # this needs to be tuned
 tap_dur: 0.01 # this needs to be tuned
 speed: 20 # this needs to be tuned
+z_offset: 0
 # Adjust this to your liking
 samples: 3
 sample_retract_dist: 3.0
@@ -52,6 +61,16 @@ samples_result: median
 samples_tolerance: 0.01
 samples_tolerance_retries: 20
 ```
+
+If you want to use the probe as Z endstop as well:
+
+```
+[stepper_z]
+... your remaining config ...
+endstop_pin: probe:z_virtual_endstop
+```
+
+Make sure to remove `position_endstop` in this case.
 
 ## Tuning guide
 
