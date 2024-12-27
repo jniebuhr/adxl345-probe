@@ -28,13 +28,14 @@ class ADXL345Probe:
         if int_pin != 'int1' and int_pin != 'int2':
             raise config.error('int_pin must specify one of int1 or int2 pins')
         probe_pin = config.get('probe_pin')
+        adxl345_name = config.get('chip', 'adxl345')
         self.int_map = 0x40 if int_pin == 'int2' else 0x0
         self.tap_thresh = config.getfloat('tap_thresh', 5000, minval=TAP_SCALE, maxval=100000.)
         self.tap_dur = config.getfloat('tap_dur', 0.01, above=DUR_SCALE, maxval=0.1)
         self.position_endstop = config.getfloat('z_offset')
         self.disable_fans = [fan.strip() for fan in config.get("disable_fans", "").split(",") if fan]
 
-        self.adxl345 = self.printer.lookup_object('adxl345')
+        self.adxl345 = self.printer.lookup_object(adxl345_name)
         self.next_cmd_time = self.action_end_time = 0.
         # Create an "endstop" object to handle the sensor pin
         ppins = self.printer.lookup_object('pins')
